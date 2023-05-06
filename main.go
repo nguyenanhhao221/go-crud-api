@@ -49,6 +49,22 @@ func getMovies(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+// Get the movie base on the id
+func getMovie(w http.ResponseWriter, r *http.Request) {
+	// Set the response header to let client know that it a json
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+	for _, movie := range movies {
+		if movie.ID == params["id"] {
+			if err := json.NewEncoder(w).Encode(movie); err != nil {
+				log.Printf("Error encoding movies: %v", err)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				return
+			}
+		}
+	}
+}
 func main() {
 	// Initialize a new router
 	r := mux.NewRouter()
@@ -59,7 +75,7 @@ func main() {
 
 	// Handle for the route /movies
 	r.HandleFunc("/movies", getMovies).Methods("GET")
-
+	r.HandleFunc("/movies/{id}", getMovie).Methods("GET")
 	// Start the app
 	port := "8080"
 	fmt.Printf("Starting server at port:%s", port)
