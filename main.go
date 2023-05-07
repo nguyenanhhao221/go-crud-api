@@ -86,6 +86,9 @@ func getMovie(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+	// Error when cannot find the movie
+	log.Printf("Cannot found the movie with this id")
+	http.Error(w, "No movie with this ID", http.StatusNotFound)
 }
 
 // Create a new movie handler
