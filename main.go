@@ -44,7 +44,9 @@ func getMovies(w http.ResponseWriter, r *http.Request) {
 
 	// Need to use json package to encode the movies slice into json format
 	// These syntax is check if the encoding process have any error
+	// While encoding it write to the w (response) to the client
 	if err := json.NewEncoder(w).Encode(movies); err != nil {
+		// Handle if there is an error
 		log.Printf("Error encoding movies: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
