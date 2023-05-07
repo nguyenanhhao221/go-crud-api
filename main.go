@@ -52,6 +52,26 @@ func getMovies(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func deleteMovie(w http.ResponseWriter, r *http.Request) {
+	// Set the response header to let client know that it a json
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+	for index, movie := range movies {
+		if movie.ID == params["id"] {
+			movies = append(movies[:index], movies[index+1:]...)
+			break
+		}
+	}
+
+	if err := json.NewEncoder(w).Encode(movies); err != nil {
+		log.Printf("Error encoding movies: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+}
+
 // Get the movie base on the id
 func getMovie(w http.ResponseWriter, r *http.Request) {
 	// Set the response header to let client know that it a json
@@ -79,6 +99,7 @@ func main() {
 	// Handle for the route /movies
 	r.HandleFunc("/movies", getMovies).Methods("GET")
 	r.HandleFunc("/movies/{id}", getMovie).Methods("GET")
+	r.HandleFunc("/movies/{id}", deleteMovie).Methods("DELETE")
 	// Start the app
 	port := "8080"
 	fmt.Printf("Starting server at port:%s", port)
