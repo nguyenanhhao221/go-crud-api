@@ -7,10 +7,9 @@ import (
 	"log"
 
 	"github.com/gorilla/mux"
+	"github.com/lucsky/cuid"
 
-	// "math/rand"
 	"net/http"
-	// "strconv"
 )
 
 /*
@@ -88,6 +87,24 @@ func getMovie(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+// Create a new movie handler
+func createMovie(w http.ResponseWriter, r *http.Request) {
+	var movie Movie
+	// Decode the body and stream its result into the movie variable
+	// Here we pass the pointer of the movie into the Decode function so the func modify the movie variable directly
+	// If we don not use the & it will it will create a copy of movie and modify that copy instead, which is not really optimized
+	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
+		log.Printf("Error decoding movie: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	movie.ID = cuid.New()
+
+	movies = append(movies, movie)
+	getMovies(w, r)
+}
+
 func main() {
 	// Initialize a new router
 	r := mux.NewRouter()
@@ -98,6 +115,7 @@ func main() {
 
 	// Handle for the route /movies
 	r.HandleFunc("/movies", getMovies).Methods("GET")
+	r.HandleFunc("/movies", createMovie).Methods("POST")
 	r.HandleFunc("/movies/{id}", getMovie).Methods("GET")
 	r.HandleFunc("/movies/{id}", deleteMovie).Methods("DELETE")
 	// Start the app
