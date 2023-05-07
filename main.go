@@ -95,7 +95,7 @@ func getMovie(w http.ResponseWriter, r *http.Request) {
 func createMovie(w http.ResponseWriter, r *http.Request) {
 	var movie Movie
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusAccepted)
 	// Decode the body and stream its result into the movie variable
 	// Here we pass the pointer of the movie into the Decode function so the func modify the movie variable directly
 	// If we don not use the & it will it will create a copy of movie and modify that copy instead, which is not really optimized
