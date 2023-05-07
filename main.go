@@ -115,6 +115,23 @@ func createMovie(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Update a movie handler
+func updateMovie(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusAccepted)
+
+	params := mux.Vars(r)
+	var updateMovie Movie
+	_ = json.NewDecoder(r.Body).Decode(&updateMovie)
+	for index, movie := range movies {
+		if movie.ID == params["id"] {
+			updateMovie.ID = movie.ID
+			movies[index] = updateMovie
+			_ = json.NewEncoder(w).Encode(updateMovie)
+		}
+	}
+}
+
 func main() {
 	// Initialize a new router
 	r := mux.NewRouter()
@@ -123,11 +140,12 @@ func main() {
 	movies = append(movies, Movie{ID: "1", Isbn: "123", Title: "Movie one", Director: &Director{FirstName: "James", LastName: "Gunn"}})
 	movies = append(movies, Movie{ID: "2", Isbn: "289137", Title: "Movie Two", Director: &Director{FirstName: "Nguyen", LastName: "Duy"}})
 
-	// Handle for the route /movies
+	// Handle for the route
 	r.HandleFunc("/movies", getMovies).Methods("GET")
 	r.HandleFunc("/movies", createMovie).Methods("POST")
 	r.HandleFunc("/movies/{id}", getMovie).Methods("GET")
 	r.HandleFunc("/movies/{id}", deleteMovie).Methods("DELETE")
+	r.HandleFunc("/movies/{id}", updateMovie).Methods("PUT")
 	// Start the app
 	port := "8080"
 	fmt.Printf("Starting server at port:%s", port)
